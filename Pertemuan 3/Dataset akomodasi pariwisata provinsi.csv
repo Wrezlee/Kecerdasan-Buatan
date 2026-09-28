@@ -1,0 +1,51 @@
+﻿Provinsi,Jumlah Akomodasi yang Tersedia pada Hotel Bintang,Jumlah Kamar yang Tersedia pada Hotel Bintang,Jumlah Tempat Tidur yang Tersedia pada Hotel Bintang
+Aceh,62,3553,5350
+Sumatera Utara,168,13570,18689
+Sumatera Barat,103,5895,8003
+Riau,110,9614,13264
+Jambi,43,3242,4433
+Sumatera Selatan,117,8692,12411
+Bengkulu,19,1192,1800
+Lampung,55,5008,7213
+Kepulauan Bangka Belitung,58,4100,5884
+Kepulauan Riau,119,12539,16730
+DKI Jakarta,480,55092,85296
+Jawa Barat,654,61560,90901
+Jawa Tengah,415,35452,51963
+DI Yogyakarta,222,21467,31737
+Jawa Timur,380,42389,60453
+Banten,167,17426,25992
+Bali,699,84500,106533
+Nusa Tenggara Barat,171,13636,16690
+Nusa Tenggara Timur,58,5058,6839
+Kalimantan Barat,58,5283,7221
+Kalimantan Tengah,38,2694,4227
+Kalimantan Selatan,63,5643,7963
+Kalimantan Timur,70,7128,10129
+Kalimantan Utara,7,375,596
+Sulawesi Utara,67,5733,7850
+Sulawesi Tengah,15,1782,2523
+Sulawesi Selatan,186,14431,20674
+Sulawesi Tenggara,27,1953,2865
+Gorontalo,8,672,1021
+Sulawesi Barat,5,375,556
+Maluku,38,2041,3235
+Maluku Utara,22,1133,1385
+Papua Barat,14,695,892
+Papua Barat Daya,18,1473,2247
+Papua,31,2476,3507
+Papua Selatan,6,299,418
+Papua Tengah,12,929,1256
+Papua Pegunungan,NA,NA,NA
+Indonesia,4787,459182,648898
+,,,
+Keterangan,,,
+a,,,
+:  25%< Relative Standard Error (RSE) ≤50%,,,
+b : Relative Standard Error (RSE)  >50,,,
+c : Total provinsi bukan merupakan penjumlahan kab/kota yang ditampilkan karena,,,
+terdapat kab/kota yang tidak memenuhi kriteria estimasi/ The total for provinces is not,,,
+the sum of the districts/cities displayed because there are districts/cities,,,
+that do not meet the estimation criteria.,,,
+NA : Data tidak dapat ditampilkan/The data can not,,,
+be displayed,,,
