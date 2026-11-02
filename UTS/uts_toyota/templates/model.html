@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><h2>Arsitektur & Parameter MLP</h2>
+<ul>
+<li>Input layer: <b>10</b> neuron (window 10 bulan) · Hidden layer: <b>10–15</b> neuron (1 lapis) · Output: <b>1</b> neuron</li>
+<li>Aktivasi hidden: <b>ReLU</b> · Optimizer: <b>Adam</b> (learning rate 0,01) · Epoch: <b>{{ r.epochs }}</b></li>
+<li>Library: scikit-learn <code>MLPRegressor</code> · Evaluasi: <b>MAE</b> dan <b>MSE</b> pada data uji (satuan asli, bukan ternormalisasi); MAPE &amp; RMSE sebagai tambahan agar dapat dibandingkan dengan jurnal.</li>
+</ul></div>
+<div class="card"><h2>Hasil Evaluasi per Arsitektur (data uji, 6 bulan)</h2>
+<div class="scroll"><table>
+<tr><th>Arsitektur</th><th>MAE</th><th>MSE</th><th>RMSE</th><th>MAPE (%)</th><th>Rata-rata MAE 10 seed</th></tr>
+{% for x in r.results %}<tr class="{{ 'best' if x.arsitektur==r.best.arsitektur }}"><td>{{ x.arsitektur }}</td><td>{{ x.mae|angka(2) }}</td><td>{{ x.mse|angka(0) }}</td><td>{{ x.rmse|angka(2) }}</td><td>{{ x.mape|angka(2) }}</td><td>{{ x.mean_mae_10seed|angka(2) }}</td></tr>{% endfor %}
+<tr><td>Baseline naif (bulan lalu)</td><td>{{ r.baseline_naif.mae|angka(2) }}</td><td>{{ r.baseline_naif.mse|angka(0) }}</td><td>{{ r.baseline_naif.rmse|angka(2) }}</td><td>{{ r.baseline_naif.mape|angka(2) }}</td><td>–</td></tr>
+</table></div>
+<p class="mut">Baris hijau = arsitektur dengan MAE uji terkecil ({{ r.best.arsitektur }}), cara pemilihan yang sama dengan jurnal. Kolom terakhir (rata-rata 10 inisialisasi bobot acak berbeda) menunjukkan bahwa hasil MLP sensitif terhadap inisialisasi, sehingga selisih antar-arsitektur sebagian besar bukan perbedaan yang pasti. Pemilihan berdasar data uji juga cenderung optimistis.</p>
+</div>
+<div class="card"><h2>Aktual vs Prediksi – Data Uji ({{ r.best.arsitektur }})</h2>
+<div class="box"><canvas id="c1"></canvas></div>
+<div class="scroll" style="margin-top:12px"><table><tr><th>Bulan</th><th>Aktual</th><th>Prediksi</th><th>Selisih</th></tr>
+{% for i in range(r.test.bulan|length) %}<tr><td>{{ r.test.bulan[i]|bulan }}</td><td>{{ r.test.aktual[i]|angka }}</td><td>{{ r.test.prediksi[i]|angka }}</td><td>{{ (r.test.aktual[i]-r.test.prediksi[i])|angka }}</td></tr>{% endfor %}</table></div>
+</div>
+<div class="card"><h2>Seluruh Periode</h2><div class="box"><canvas id="c2"></canvas></div>
+<p class="mut">Garis prediksi memakai prediksi satu langkah (10 bulan aktual → bulan berikutnya). Bagian sebelum {{ r.test.bulan[0]|bulan }} adalah data latih.</p></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const T={{ r.test|tojson }}, A={{ df.bulan.tolist()|tojson }}, V={{ df.penjualan.tolist()|tojson }}, F={{ r.fit_all|tojson }};
+new Chart(c1,{type:'line',data:{labels:T.bulan,datasets:[{label:'Aktual',data:T.aktual,borderColor:'#c8102e'},{label:'Prediksi MLP',data:T.prediksi,borderColor:'#1570ef',borderDash:[6,4]}]},options:{maintainAspectRatio:false}});
+const fm={};F.bulan.forEach((b,i)=>fm[b]=F.prediksi[i]);
+new Chart(c2,{type:'line',data:{labels:A,datasets:[{label:'Aktual',data:V,borderColor:'#c8102e',pointRadius:1},{label:'Prediksi MLP',data:A.map(b=>fm[b]??null),borderColor:'#1570ef',pointRadius:1}]},options:{maintainAspectRatio:false,scales:{x:{ticks:{maxTicksLimit:10}}}}});
+</script>
+{% endblock %}

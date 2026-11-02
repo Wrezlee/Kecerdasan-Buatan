@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><h2>Tahapan Preprocessing</h2>
+<h3>1. Pembersihan data</h3>
+<p>Baris Toyota diambil dari bagian <i>A. Wholesales</i> tiap laporan tahunan GAIKINDO. Format angka diseragamkan (laporan 2022 memakai pemisah ribuan koma, tahun lain titik). Nilai kosong: <b>{{ missing }}</b>. Jumlah 12 bulan tiap tahun dicocokkan dengan kolom total tahun.</p>
+<h3>2. Normalisasi Min–Max</h3>
+<p>Nilai diskalakan ke rentang 0–1 dengan <code>x' = (x − min) / (max − min)</code>. Min = {{ ymin|angka }}, Max = {{ ymax|angka }}, dihitung <b>hanya dari data latih</b> agar data uji tidak bocor ke proses pelatihan.</p>
+<h3>3. Sliding window</h3>
+<p>Model menerima <b>{{ r.window }} bulan</b> berturut-turut sebagai input dan memprediksi bulan ke-{{ r.window+1 }} (sesuai 10 neuron input pada jurnal). Contoh:</p>
+<div class="scroll"><table><tr><th>Input (10 bulan)</th><th>Target</th></tr>
+{% for e in ex %}<tr><td style="text-align:left">{{ e.x|join(', ') }}</td><td>{{ e.t|angka }} ({{ e.target }})</td></tr>{% endfor %}</table></div>
+<h3>4. Pembagian data</h3>
+<p>Dari {{ r.n_data }} bulan terbentuk {{ r.n_train_samples + r.n_test_samples }} sampel. <b>{{ r.n_train_samples }}</b> sampel untuk latih dan <b>{{ r.n_test_samples }}</b> sampel (6 bulan terakhir: {{ r.test.bulan[0]|bulan }} – {{ r.test.bulan[-1]|bulan }}) untuk uji. Split dilakukan berurutan (tidak diacak) karena data deret waktu.</p>
+</div>
+{% endblock %}

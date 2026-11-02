@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><h2>Prediksi Penjualan untuk Periode Tertentu</h2>
+<p>Pilih bulan, lalu model {{ r.best.arsitektur }} memprediksi penjualan Toyota (unit). Untuk bulan di luar data ({{ df.bulan.iloc[-1]|bulan }}), prediksi dilakukan <b>rekursif</b>: hasil prediksi dipakai sebagai input bulan berikutnya, sehingga akurasinya menurun makin jauh ke depan.</p>
+<form method="post" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+<input type="month" name="bulan" value="{{ pilihan }}" min="{{ min_m }}" max="{{ max_m }}" required>
+<button type="submit">Prediksi</button></form>
+{% if err %}<div class="err">{{ err }}</div>{% endif %}
+{% if hasil %}<div class="res">Prediksi {{ hasil.bulan|bulan }} ({{ hasil.jenis }})<br><b>{{ hasil.prediksi|angka }} unit</b>
+{% if hasil.aktual is not none %}<br><span class="mut" style="color:inherit">Aktual: {{ hasil.aktual|angka }} unit · selisih {{ (hasil.aktual-hasil.prediksi)|angka }}</span>{% endif %}</div>{% endif %}
+</div>
+<div class="card"><h2>Prakiraan 12 Bulan ke Depan</h2><div class="box"><canvas id="c"></canvas></div>
+<div class="scroll" style="margin-top:12px"><table><tr><th>Bulan</th><th>Prediksi (unit)</th></tr>
+{% for d in deret %}<tr><td>{{ d.bulan|bulan }}</td><td>{{ d.nilai|angka }}</td></tr>{% endfor %}</table></div>
+<p class="mut">Catatan: prakiraan jangka panjang dari MLP cenderung mendatar menuju rata-rata, karena model tidak mengetahui faktor eksternal (kebijakan pajak, harga, libur, promosi).</p></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const H={{ df.tail(24).to_dict('list')|tojson }}, D={{ deret|tojson }};
+new Chart(c,{type:'line',data:{labels:H.bulan.concat(D.map(d=>d.bulan)),datasets:[
+{label:'Aktual',data:H.penjualan.concat(D.map(()=>null)),borderColor:'#c8102e'},
+{label:'Prakiraan',data:H.penjualan.map((v,i)=>i==H.penjualan.length-1?v:null).concat(D.map(d=>d.nilai)),borderColor:'#1570ef',borderDash:[6,4]}]},options:{maintainAspectRatio:false}});
+</script>
+{% endblock %}

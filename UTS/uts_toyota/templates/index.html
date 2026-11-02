@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+<h2>Sumber Dataset</h2>
+<p>Data penjualan <b>wholesales</b> (distribusi dari pabrik ke dealer) merek <b>Toyota</b> per bulan, dari <b>GAIKINDO</b> (Gabungan Industri Kendaraan Bermotor Indonesia), laporan <i>Domestic Auto Production &amp; Sales – Data by Brand</i> di <code>gaikindo.or.id</code>.</p>
+<p class="mut">Dataset yang sama dengan jurnal acuan (Afkar dkk., JIP – Jurnal Informatika Polinema, 2024), tetapi periodenya lebih baru: {{ r.periode[0]|bulan }} s.d. {{ r.periode[1]|bulan }}. Angka tiap tahun sudah dicocokkan dengan total tahunan yang tercetak di laporan GAIKINDO.</p>
+</div>
+<div class="card">
+<h2>Karakteristik Data</h2>
+<div class="grid">
+<div class="k"><b>{{ r.n_data }}</b><span>titik data bulanan</span></div>
+<div class="k"><b>{{ stats['mean']|angka }}</b><span>rata-rata (unit/bulan)</span></div>
+<div class="k"><b>{{ stats['std']|angka }}</b><span>simpangan baku</span></div>
+<div class="k"><b>{{ stats['min']|angka }}</b><span>minimum</span></div>
+<div class="k"><b>{{ stats['max']|angka }}</b><span>maksimum</span></div>
+</div>
+<ul>
+<li><b>Deret waktu univariat</b>: satu variabel (unit terjual) dengan frekuensi bulanan.</li>
+<li>Tidak ada nilai kosong. Terdapat fluktuasi tajam, misalnya Mei 2022 turun ke 13.297 unit dan bulan Lebaran (Mei 2022, Apr 2023, Apr 2024, Apr 2025) cenderung rendah karena hari kerja/pengiriman berkurang.</li>
+<li>Tren menurun sejak 2023: total tahunan turun dari 336.777 (2023) ke 250.431 (2025).</li>
+</ul>
+<div class="scroll"><table><tr><th>Tahun</th><th>Jumlah bulan</th><th>Total unit</th></tr>
+{% for t in tahunan %}<tr><td>{{ t.tahun }}</td><td>{{ t.count }}</td><td>{{ t['sum']|angka }}</td></tr>{% endfor %}</table></div>
+</div>
+<div class="card"><h2>Grafik Penjualan Bulanan</h2><div class="box"><canvas id="c"></canvas></div></div>
+<div class="card"><h2>Tabel Data</h2><div class="scroll" style="max-height:360px;overflow-y:auto"><table><tr><th>Bulan</th><th>Penjualan (unit)</th></tr>
+{% for _,row in df.iterrows() %}<tr><td>{{ row.bulan|bulan }}</td><td>{{ row.penjualan|angka }}</td></tr>{% endfor %}</table></div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+new Chart(document.getElementById('c'),{type:'line',data:{labels:{{ df.bulan.tolist()|tojson }},datasets:[{label:'Penjualan Toyota (unit)',data:{{ df.penjualan.tolist()|tojson }},borderColor:'#c8102e',tension:.25,pointRadius:2}]},options:{maintainAspectRatio:false,scales:{x:{ticks:{maxTicksLimit:10}}}}});
+</script>
+{% endblock %}

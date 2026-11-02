@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><h2>Perbandingan dengan Jurnal Acuan</h2>
+<p class="mut">Afkar, Randa, Saputra (2024). <i>Prediksi Penjualan Mobil Toyota di Indonesia Menggunakan Multi-Layer Perceptron</i>. JIP – Jurnal Informatika Polinema, 11(1), 91–98.</p>
+<div class="scroll"><table>
+<tr><th></th><th>Jurnal</th><th>Proyek ini</th></tr>
+<tr><td>Sumber data</td><td>GAIKINDO</td><td>GAIKINDO</td></tr>
+<tr><td>Periode data</td><td>Jan 2011 – Mei 2023 (149 bulan)</td><td>{{ r.periode[0]|bulan }} – {{ r.periode[1]|bulan }} ({{ r.n_data }} bulan)</td></tr>
+<tr><td>Data uji</td><td>Des 2022 – Mei 2023 (6 bulan)</td><td>{{ r.test.bulan[0]|bulan }} – {{ r.test.bulan[-1]|bulan }} (6 bulan)</td></tr>
+<tr><td>Arsitektur terbaik</td><td>10-15-1</td><td>{{ r.best.arsitektur }}</td></tr>
+<tr><td>Epoch / optimizer / aktivasi</td><td>300 / – / –</td><td>300 / Adam / ReLU</td></tr>
+<tr><td>MAE</td><td>{{ r.jurnal.mae|angka(2) }}</td><td>{{ r.best.mae|angka(2) }}</td></tr>
+<tr><td>MSE</td><td>{{ r.jurnal.mse|angka(0) }} <span class="mut">(dihitung ulang dari Tabel 11)</span></td><td>{{ r.best.mse|angka(0) }}</td></tr>
+<tr><td>RMSE</td><td>{{ r.jurnal.rmse|angka(2) }}</td><td>{{ r.best.rmse|angka(2) }}</td></tr>
+<tr><td>MAPE (%)</td><td>{{ r.jurnal.mape|angka(2) }}</td><td>{{ r.best.mape|angka(2) }}</td></tr>
+</table></div>
+<p class="mut">Jurnal tidak melaporkan MSE; nilai di atas dihitung dari tabel prediksi jurnal (MAE dan MAPE hasil hitung ulang sama dengan yang dilaporkan jurnal, sehingga perhitungan valid).</p></div>
+<div class="card"><h2>Persamaan</h2><ul>
+<li>Metode sama: MLP dengan input 10 data historis (window 10 bulan), 1 hidden layer 10–15 neuron, 1 output, 300 epoch.</li>
+<li>Sumber data sama (GAIKINDO, penjualan Toyota bulanan) dan jumlah data uji sama (6 bulan terakhir).</li>
+<li>Arsitektur terbaik dipilih dengan MAE data uji terkecil, dan nilai error tidak berbeda jauh pada orde besarnya (galat sekitar 8–9% dari penjualan bulanan; jurnal 6,8%).</li>
+<li>Kedua hasil menunjukkan model kesulitan pada bulan dengan lonjakan atau penurunan tajam (misalnya bulan Lebaran yang rendah).</li>
+</ul></div>
+<div class="card"><h2>Perbedaan</h2><ul>
+<li>Periode &amp; jumlah data: jurnal 149 bulan (2011–2023), proyek ini {{ r.n_data }} bulan (2022–2026).</li>
+<li>Arsitektur terbaik: jurnal 10-15-1, proyek ini {{ r.best.arsitektur }}.</li>
+<li>Error: MAE jurnal ({{ r.jurnal.mae|angka(0) }}) sedikit lebih kecil daripada proyek ini ({{ r.best.mae|angka(0) }}); MSE jurnal ({{ r.jurnal.mse|angka(0) }}) jauh lebih kecil daripada proyek ({{ r.best.mse|angka(0) }}).</li>
+<li>Proyek ini memakai normalisasi Min–Max dan optimizer Adam yang dinyatakan eksplisit; jurnal tidak menjelaskan keduanya.</li>
+</ul></div>
+<div class="card"><h2>Kemungkinan Penyebab Perbedaan</h2><ul>
+<li><b>Data latih jauh lebih sedikit.</b> Hanya {{ r.n_train_samples }} sampel latih (jurnal sekitar 130). MLP dengan ±160 bobot mudah <i>overfitting</i>/kurang stabil pada data sekecil ini.</li>
+<li><b>Periode uji berbeda.</b> Jurnal menguji pada masa pemulihan pasca pandemi dengan pola cukup teratur; periode uji proyek ini (Apr–Sep 2026) berada pada tren penjualan yang menurun.</li>
+<li><b>Inisialisasi bobot acak.</b> Rata-rata MAE 10 percobaan seed berbeda berkisar {{ r.results|map(attribute='mean_mae_10seed')|min|angka(0) }}–{{ r.results|map(attribute='mean_mae_10seed')|max|angka(0) }}, sehingga arsitektur terbaik bisa berganti hanya karena seed.</li>
+<li><b>Detail yang tidak dilaporkan jurnal</b> (normalisasi, learning rate, optimizer, library, pengacakan, cara pemilihan data uji) sehingga replikasi persis tidak mungkin.</li>
+<li><b>Perbedaan versi data.</b> GAIKINDO sesekali merevisi angka (file 2022 dan 2025 berlabel “rev”).</li>
+<li>Pemilihan arsitektur terbaik dari data uji (kedua studi) membuat error cenderung terlalu optimis.</li>
+</ul></div>
+<div class="card"><h2>Prediksi Data Uji: Jurnal</h2><div class="scroll"><table><tr><th>Bulan</th><th>Aktual</th><th>Prediksi jurnal</th></tr>
+{% for i in range(6) %}<tr><td>{{ r.jurnal.bulan[i]|bulan }}</td><td>{{ r.jurnal.aktual[i]|angka }}</td><td>{{ r.jurnal.prediksi[i]|angka }}</td></tr>{% endfor %}</table></div></div>
+{% endblock %}
